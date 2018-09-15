@@ -1,0 +1,218 @@
+<!--
+2) 编写一个注册表单，配合js完成表单验证
+* 用户名长度必须至少2个字符
+* 密码强度校验
+	* 如果有字母、数字、特殊字符其中三项，且长度为6以上为高强度
+	* 如果有字母、数字、特殊字符其中两项，且长度为6以上为中强度
+	* 如果仅有字母、数字、特殊字符其中一项，或长度不足6，为低强度
+* 短信验证码发送按钮，点击后变灰（不可用）进行60 s倒计时，倒计时结束，才能重新点击
+* 同意许可协议复选框必须勾选
+* 有一项校验不通过，在表单项之后给出相应的提示
+* 在校验不通过之前，注册按钮为灰色（不可用）-->
+<!DOCTYPE html>
+<html lang="en" xmlns:v-model="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>表单验证</title>
+    <script src="js/vue.js"></script>
+</head>
+<body>
+    <div id="div" align="center">
+        <form Borderstyle = bsSingle action="#"  method="get" style="color: darkcyan">
+            <table    width="40%" style="background-color: #f0f8ff" >
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td align="left">登陆注册</td>
+                    </tr>
+                    <tr>
+                        <td align="right">用户名</td>
+                        <td width="70%">
+                            <input type="text" name="username"  v-model="usernameMsg" @blur="checkusername" >
+                            <span style="color: brown">{{ getUsernameMsg }}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right">密码</td>
+                        <td>
+                            <input type="password" name="password"  v-model="passwordMsg" @blur="checkpassword">
+                            <span style="color: brown">{{ getPasswordMsg }}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right">验证码</td>
+                        <td>
+                            <input type="text" name="code"  v-model="codeMsg" @click="checkcode">
+                            <input type="button" v-model:value="val"  :disabled="disabledcheck" @click="delay">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td align="left">
+                            <input  type="checkbox"v-model:checked="checkbox" @click="checkedbox">同意许可协议
+                            <span style="color: brown">{{ getAgreeMsg }}</span>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td></td>
+                        <td align="left">
+                            <input type="submit" value="注册" :disabled="submitcheck" >
+                            <input type="reset" value="重置" >
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </form>
+    </div>
+</body>
+
+<script>
+
+     var v = new Vue({
+         el:"#div",
+         data:{
+
+             flag1:false,            //判断每个信息是否符合条件的 标志
+             flag2:false,
+             flag3:false,
+             flag4:false,
+
+             disabledcheck: false,   //验证码按钮的 disabled 属性
+             submitcheck:true,       //提交按钮的 disabled 属性
+             checkbox:true,          //单选框checkbox 的 checked 属性
+
+             val:"发送验证码",
+
+             usernameMsg:"",        //获取文本框输入的内容--用户名
+             getUsernameMsg:null,   //显示提示信息
+
+
+             passwordMsg:"",        //获取文本框输入的内容--密码
+             getPasswordMsg:null,   //显示提示信息
+
+             codeMsg:"",            //获取文本框输入的内容--验证码
+             time:60,
+
+
+             getAgreeMsg:null,     //显示提示信息
+
+         },
+         methods:{
+             checkusername:function () {
+                 if(this.usernameMsg.length<2){
+                     this.getUsernameMsg="必须输入两个字符以上的用户名";
+                     this.flag1=false;
+                     this.check();
+                 }else{
+                     this.getUsernameMsg=null;
+                     this.flag1=true;
+                     this.check();
+                 }
+             },
+
+             checkpassword:function () {
+                 var count=0;
+
+
+                 if(this.passwordMsg.length==0){
+                     this.getPasswordMsg="必须填写密码";
+                     this.flag2=false;
+                     this.check();
+                     return;
+                 }
+
+                 if(/\d/.test(this.passwordMsg)){
+                     count++;
+                 }
+
+                 if(/\w/.test(this.passwordMsg)){
+                     count++;
+                 }
+
+                 if(/\W/.test(this.passwordMsg)){
+                     count++;
+                 }
+
+
+                 if(count==3 && this.passwordMsg.length>=6){
+                     this.getPasswordMsg="高强度";
+                     this.flag2= true;
+
+                 }else if(count==2 && this.passwordMsg.length>=6){
+                     this.getPasswordMsg="中强度";
+                     this.flag2= true;
+
+                 }else{
+                     this.getPasswordMsg="低强度";
+                     this.flag2= true;
+                 }
+
+                 this.check();
+             },
+
+             checkcode:function(){
+                if(this.codeMsg.length==0){
+                    this.flag3= false;
+
+                }else{
+                    this.flag3=  true;
+                }
+                 this.check();
+             },
+
+
+             checkedbox:function(){
+
+                 if(!this.checkbox==false){
+                     this.getAgreeMsg="必须勾选";
+                     this.checkbox=false;
+                     this.flag4=false;
+                     this.check();
+                 }else{
+                     this.getAgreeMsg=null;
+                     this.flag4=true;
+                     this.check();
+                 }
+
+             },
+
+
+             delay:function () {
+                 var _this = this;  // 解决this 在setTimeOut 无效.
+                 _this.disabledcheck=true;
+
+                 setTimeout(_this.delaystart,1000); // 延时调用
+             },
+
+
+             delaystart: function () {
+                 var _this=this;
+
+                 if(_this.time>0 & _this.codeMsg.length<4){
+                     _this.time=_this.time-1;
+                     _this.val=_this.time+"后重新发送验证码";
+                     setTimeout(_this.delaystart,1000);
+                 }else{
+                     _this.disabledcheck=false;
+                     _this.val="发送验证码";
+                     _this.time=60;
+
+                 }
+
+                 _this.check();
+             },
+
+             check:function(){
+
+                 if(this.flag1 & this.flag2 & this.flag3 & this.flag4){
+                     this.submitcheck=false;
+                 }else{
+                     this.submitcheck=true;
+                 }
+             }
+         }
+     });
+</script>
+</html>

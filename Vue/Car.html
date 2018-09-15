@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-model="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车</title>
+    <script src="js/vue.js"></script>
+</head>
+<body>
+    <!--视图-->
+    <div id="car">
+
+        <!--购物车-->
+        <table border="1" align="center">
+            <thead>
+                <tr>
+                    <td colspan="7" align="center">购物车</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" v-model:checked="checkAll" @click="checkall"></td>
+                    <td>编号</td>
+                    <td>名字</td>
+                    <td>价格</td>
+                    <td>图片</td>
+                    <td>数量</td>
+                    <td>移除</td>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr v-for="(p,i) in list">
+                    <td><input type="checkbox" v-model:checked="p.ch" @click="che(i+1)"></td>
+                    <td>{{i+1}}</td>
+                    <td>{{p.name}}</td>
+                    <td>{{p.price}}</td>
+                    <td><img width="50%" :src="'images/'+ p.img" ></td>
+                    <td>
+                        <input type="button" value="-" @click="sub1(i)">
+                        <input type="number" v-model:value="p.count">
+                        <input type="button" value="+" @click="add1(i)">
+                    </td>
+                    <td><input type="button" value="移除" @click="remove(i)"></td>
+                </tr>
+            </tbody>
+
+            <tfoot>
+            <tr>
+                <td colspan="7" align="right">总价：<span>{{total}}</span></td>
+            </tr>
+            </tfoot>
+        </table>
+
+        <br>
+
+        <!--商品列表-->
+        <table border="1" align="center">
+            <thead>
+                <tr>
+                    <td colspan="4" align="center">商品列表</td>
+                </tr>
+                <tr>
+                    <td>名字</td>
+                    <td>价格</td>
+                    <td>图片</td>
+                    <td>添加</td>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr v-for="(l,i) in products">
+                    <td>{{l.name}}</td>
+                    <td>{{l.price}}</td>
+                    <td><img width="50%" :src="'images/'+l.img" ></td>
+                    <td><input type="button" value="添加进购物车" @click="get(i)"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+<script>
+    var v = new Vue({
+
+        //将 数据模型 与 视图 联系起来
+        el:"#car",
+
+        //属性 数据模型
+        data:{
+            checkAll:true,  //全选框的 checked 属性
+
+
+            /*购物车*/
+            list:[
+                {name:"商品1",price:3000,img:"5a3f53f0N113f4557.jpg",count:1,ch:true},
+                {name:"商品2",price:2000,img:"5a2ed94cNa1503f19.jpg",count:1,ch:true},
+                {name:"商品3",price:1000,img:"5a6b23b7N4a569d9d.jpg",count:1,ch:true}
+            ],
+
+            /*商品列表*/
+            products:[
+                {name:"商品1",price:3000,img:"5a3f53f0N113f4557.jpg"},
+                {name:"商品2",price:2000,img:"5a2ed94cNa1503f19.jpg"},
+                {name:"商品3",price:1000,img:"5a6b23b7N4a569d9d.jpg"},
+                {name:"商品4",price:1000,img:"5a50aaf6Nb50197b0.jpg"},
+                {name:"商品5",price:1000,img:"5a67e525N943a5b19.jpg"},
+                {name:"商品6",price:1000,img:"5a162cbbN643981c9.jpg"}
+            ]
+        },
+        computed:{
+            //计算被勾选中的商品的总价
+          total:function(){
+              var sum=0.0;
+              for (var i = 0; i < this.list.length; i++) {
+                  if(this.list[i].ch){
+                      sum += this.list[i].count * this.list[i].price;
+                  }
+              }
+
+              return sum;
+          }
+        },
+
+        methods:{
+
+            // 移除方法
+            remove:function(i){
+                this.list.splice(i,1);
+
+            },
+
+            //商品数量加1
+            add1:function (i) {
+                this.list[i].count=this.list[i].count+1;
+
+            },
+
+            //商品数量减1
+            sub1:function(i){
+                var num=this.list[i].count;
+                if(num>1){
+                    this.list[i].count=num-1;
+                }
+
+            },
+
+            //全选
+            checkall:function(){
+
+                for (var i = 0; i < this.list.length; i++) {
+                    console.log(!this.list[i].ch);
+                   this.list[i].ch=!this.checkAll;
+                }
+
+
+            },
+
+
+            //从商品列表中添加进购物车
+            get: function (i) {
+                var p=this.products[i];
+                var flag=true;
+                for (var j = 0; j <this.list.length; j++) {
+                    if(p.name==this.list[j].name){
+                        this.add1(j);  //加1
+                        flag=false;
+                        break;
+                    }
+                }
+
+                if(flag){
+                    this.list.push({name:p.name,price:p.price,img:p.img,count:1,ch:true});
+
+                }
+            }
+        }
+
+    });
+   </script>
+
+</html>
