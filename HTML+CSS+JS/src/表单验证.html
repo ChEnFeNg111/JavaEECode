@@ -1,0 +1,177 @@
+<!--
+2) 编写一个注册表单，配合js完成表单验证
+* 用户名长度必须至少2个字符
+* 密码强度校验
+	* 如果有字母、数字、特殊字符其中三项，且长度为6以上为高强度
+	* 如果有字母、数字、特殊字符其中两项，且长度为6以上为中强度
+	* 如果仅有字母、数字、特殊字符其中一项，或长度不足6，为低强度
+* 短信验证码发送按钮，点击后变灰（不可用）进行60 s倒计时，倒计时结束，才能重新点击
+* 同意许可协议复选框必须勾选
+* 有一项校验不通过，在表单项之后给出相应的提示
+* 在校验不通过之前，注册按钮为灰色（不可用）-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+
+            //验证用户名
+            function user() {
+                var input=document.getElementById("in1");
+                var div = document.getElementById("d1");
+                if(input.value.length<2){
+                     div.innerText="用户名长度必须至少2个字符";
+                }else{
+                    div.innerText="";
+                }
+                check();
+            }
+
+            //验证密码
+            function pwd() {
+                var input=document.getElementById("in2");
+                var div=document.getElementById("d2");
+
+                //正则表达式
+                var r1=/^[A-Za-z]+$/;//全部是字母
+                var r2=/^[0-9]+$/;//全部是数字
+                var r3=/^\W+$/;//全部是特殊字符
+
+                var r4=/[A-Za-z]+/;//包含字母
+                var r5=/\d+/;//包含数字
+                var r6=/\W+/;//包含特殊字符
+
+                var str=input.value; //获取输入的 字符串
+
+
+                if(str.length>0 && str.length<6){
+
+                    if(r1.test(str) || r2.test(str) || r3.test(str)){
+                        div.innerHTML="低强度";
+                    }
+                }else {
+                    //     字母           数字           特殊
+                    if (r4.test(str) & r5.test(str) & r6.test(str)) {
+                        div.innerText = "高强度";
+                    } else {
+                        div.innerText = "中强度";
+                    }
+                }
+
+                if (str.length==0){
+                   div.innerText="请输入6位密码（只包含数字,字母,特殊字符）";
+                }
+
+                check();
+            }
+
+            //倒计时
+            function start() {
+                var sp=document.getElementById("sp");
+                var input=document.getElementById("in5");
+
+                if(sp.innerText>0 & input.value.length<4){ //四位数的验证码
+                    sp.innerText=sp.innerText-1; // 倒计时，每隔一秒 -1
+                    setTimeout(delay,1000); //递归调用
+                }else {
+                    sp.innerText=60; // 将时间重置为 60 秒
+                    var input = document.getElementById("in3");
+                    input.disabled=false; // 将发送验证码的按钮不再变灰
+
+                    check();
+                }
+
+            }
+
+            //倒计时调用
+            function delay(){
+                change();
+                setTimeout(start,1000);
+            }
+
+            //将 发送验证码 的按钮的 disabled 属性设为 true
+            function change(){
+                var input = document.getElementById("in3");
+                input.disabled=true;
+            }
+
+
+            //更改注册按钮的 disabled 属性
+            function check(){
+                var user=document.getElementById("in1");
+                var pwd =document.getElementById("in2");
+                var code=document.getElementById("in5");
+                var input = document.getElementById("in4");
+                var check=document.getElementById("in6");
+
+                if(user.value.length>=2 &  pwd.value.length!=0 & code.value.length!=0 & check.checked ){
+                    input.disabled=false;
+                }else{
+                    input.disabled=true; //如果false,则注册按钮的 disabled 的属性不变 true;
+                }
+            }
+    </script>
+</head>
+
+<body>
+    <div align="center">
+        <form method="get" style="color: darkcyan" >
+            <table   width="65%" style="background-color: #f0f8ff" >
+                <tr>
+                    <td></td>
+                    <td align="left">登陆注册</td>
+                </tr>
+
+                <tr>
+                    <td width="15%" align="right">
+                        用户名:
+                    </td>
+                    <td  align="left" width="100%">
+                        <input id="in1" type="text"  onblur="user()">
+                        <div id="d1" style=" color: red ;  display: inline"></div> <!--进行提示-->
+                    </td>
+                </tr>
+
+                <tr>
+                    <td  width="50%" align="right">
+                        密码:
+                    </td>
+                    <td  align="left">
+                        <input id="in2" type="password"  onfocus="user()" onblur="pwd()">
+                        <div id="d2" style="color: red;display: inline"></div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td  width="50%" align="right">
+                        验证码:
+                    </td>
+                    <td align="left">
+                        <input id="in5" type="text" >
+                        <input id="in3" type="button" value="发送验证码"    onclick="delay()" > <!--出发倒计时时间-->
+                        <span id="sp" style="color: blueviolet ; font-family: 'Arial Unicode MS'">60</span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td></td>
+                    <td align="left">
+                        <input id="in6" type="checkbox" checked="true" onclick="check()">同意许可协议
+                    </td>
+                </tr>
+
+                <tr >
+                    <td></td>
+                    <td align="left">
+                        <input id="in4" type="submit" value="注册" disabled="true" >
+                        <input type="reset" value="重置" >
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+
+</html>
